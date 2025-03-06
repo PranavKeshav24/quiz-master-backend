@@ -1,22 +1,18 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
-import Chapters from "../../models/chapters";
+import chapters from "../../models/chapters.js"; // Updated import
 
 const router = express.Router();
 
-// POST: Create a chapter
-router.post("/", async (req, res) => {
-  const { chapter_id, name } = req.body;
-  try {
-    const newChapter = new Chapters({
-      chapter_id: uuidv4(),
-      name,
-    });
+// GET: Get a specific chapter
+router.get("/", async (req, res) => {
+  const { chapter_id } = req.params;
 
-    await newChapter.save();
-    res
-      .status(201)
-      .json({ message: "Chapter created successfully", Chapters: newChapter });
+  try {
+    const chapter = await chapters.findOne({ chapter_id: chapter_id });
+
+    if (!chapter) return res.status(404).json({ message: "Chapter not found" });
+
+    res.status(200).json(chapter);
   } catch (error) {
     res
       .status(500)
@@ -24,12 +20,25 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET: Get all Chapters
-router.get("/", async (req, res) => {
-  try {
-    const chapter = await Chapters.find();
+// PATCH: Update chapter details
+router.patch("/", async (req, res) => {
+  const { chapter_id } = req.params;
+  const { name } = req.body;
 
-    res.status(200).json(chapter);
+  try {
+    const updatedChapter = await chapters.findOneAndUpdate(
+      { chapter_id: chapter_id },
+      { name },
+      { new: true }
+    );
+
+    if (!updatedChapter)
+      return res.status(404).json({ message: "Chapter not found" });
+
+    res.status(200).json({
+      message: "Chapter updated successfully",
+      chapters: updatedChapter,
+    });
   } catch (error) {
     res
       .status(500)
