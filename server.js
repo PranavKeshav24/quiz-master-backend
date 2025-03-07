@@ -7,6 +7,7 @@ import chapterRoutes from "./routes/chapters/route.js";
 import chapterByIdRoutes from "./routes/chapters/[id]/route.js";
 import questionRoutes from "./routes/questions/route.js";
 import questionByIdRoutes from "./routes/questions/[id]/route.js";
+import submitRoutes from "./routes/submit/route.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/api/chapters", chapterRoutes);
 app.use("/api/chapters", chapterByIdRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/questions", questionByIdRoutes);
+app.use("/api/submit", submitRoutes);
 
 // Only listen on a port in local development
 if (process.env.NODE_ENV !== "production") {
