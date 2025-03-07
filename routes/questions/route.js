@@ -1,30 +1,20 @@
 import express from "express";
-import Questions from "../../models/questions.js";
+import { v4 as uuidv4 } from "uuid";
+import Questions from "../../models/questions.js"; // Ensure correct path
 
 const router = express.Router();
 
-// GET all Questions
-router.get("/", async (req, res) => {
-  try {
-    const Questions = await Questions.find();
-    res.status(200).json(Questions);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching Questions", error });
-  }
-});
-
-// POST a new question
+// POST: Create a new question
 router.post("/", async (req, res) => {
   try {
-    const { question_id, question, options, answer, chapter_id } = req.body;
+    const { question, options, answer, chapter_id } = req.body;
 
-    // Check if all required fields exist
-    if (!question_id || !question || !options || !answer || !chapter_id) {
+    if (!question || !options || !answer || !chapter_id) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const newQuestion = new Questions({
-      question_id,
+      question_id: uuidv4(),
       question,
       options,
       answer,
@@ -32,9 +22,26 @@ router.post("/", async (req, res) => {
     });
 
     await newQuestion.save();
-    res.status(201).json(newQuestion);
+    res.status(201).json({
+      message: "Question created successfully",
+      question: newQuestion,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error creating question", error });
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
+// GET: Retrieve all questions
+router.get("/", async (req, res) => {
+  try {
+    const questions = await Questions.find();
+    res.status(200).json(questions);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 });
 

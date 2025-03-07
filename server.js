@@ -18,8 +18,17 @@ connectDB();
 
 // Routes
 app.use("/api/chapters", chapterRoutes);
-app.use("/api/chapters/:id", chapterByIdRoutes);
+app.use("/api/chapters", chapterByIdRoutes);
 app.use("/api/questions", questionRoutes);
-app.use("/api/questions/:id", questionByIdRoutes);
+app.use("/api/questions", questionByIdRoutes);
 
+// Only listen on a port in local development
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+// Required for Vercel deployment
 export default app;
